@@ -98,13 +98,13 @@ const authenticationController = {
       
       // verify oTP
       const userEmail=email
-      const verifyOTPs=verifyOTP(otp,userEmail)
-      if(verifyOTPs==false){
-        return res
-        .status(400)
-        .json({ error: "Wrong otp" });
-      }
-      console.log(verifyOTPs)
+      // const verifyOTPs=verifyOTP(otp,userEmail)
+      // if(verifyOTPs==false){
+      //   return res
+      //   .status(400)
+      //   .json({ error: "Wrong otp" });
+      // }
+      // console.log(verifyOTPs)
 
       // Validate the email format using a regular expression
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -129,14 +129,15 @@ const authenticationController = {
       const signer = new ethers.Wallet(wallet.privateKey);
 
       const paymasterContext = { type: "payg" };
-      const paymasterMiddleware = Presets.Middleware.verifyingPaymaster(
-        PayMasterUrl,
-        paymasterContext
-      );
-      // Initialize the Builder
-      var builder = await Presets.Builder.Kernel.init(signer, rpcUrl, {
-        paymasterMiddleware: paymasterMiddleware,
-      });
+const paymasterMiddleware = Presets.Middleware.verifyingPaymaster(
+  PayMasterUrl,
+  paymasterContext
+);
+const opts = PayMasterUrl === "" ? {} : {
+  paymasterMiddleware: paymasterMiddleware,
+}
+
+var builder = await Presets.Builder.SimpleAccount.init(signer, rpcUrl, opts);
         
       const address = builder.getSender();
       console.log(`Account address: ${address}`);
@@ -154,11 +155,11 @@ const authenticationController = {
         user_country,
         emailPending: false,
       });
+      if(address)
 
       await user.save();
       res.status(201).json({ message: "User registered successfully" });
     } catch (err) {
-      console.error(err);
       res.status(500).json({ error: err, message:"Registration failed" });
     }
   },
@@ -416,8 +417,10 @@ const authenticationController = {
 
   userOpsBuilder: async (req, res) => {
     try {
-      const { contract, getUserOp, password } = req.body;
-      console.log("userop:", getUserOp,password);
+      const {contractAddress,getUserOp, password } = req.body;
+    
+      console.log("userop:",contractAddress, getUserOp,password);
+      const callTo=[contractAddress,contractAddress]
 
       // Verify the JWT token and retrieve the user's ID
       const { email } = req.user; // Use req.user instead of localStorage
@@ -456,31 +459,32 @@ const authenticationController = {
         });
       }
 
-      // Decrypt the user's private key using the password
-      const privateKey = decrypt(user.encryptedPrivateKey, password);
-
-      const signer = new ethers.Wallet(privateKey);
-
-      const paymasterContext = { type: "payg" };
-      const paymasterMiddleware = Presets.Middleware.verifyingPaymaster(
-        PayMasterUrl,
-        paymasterContext
-      );
-      // Initialize the Builder
-      var builder = await Presets.Builder.Kernel.init(signer, rpcUrl, {
-        paymasterMiddleware: paymasterMiddleware,
-      });
-        
-      const address = builder.getSender();
-      console.log(`Account address: ${address}`);
+       // Encrypt the private key before saving it
+       const encryptedPrivateKey = decrypt(user.encryptedPrivateKey, password);
+       const signer = new ethers.Wallet(encryptedPrivateKey);
+ 
+       const paymasterContext = { type: "payg" };
+       const paymasterMiddleware = Presets.Middleware.verifyingPaymaster(
+         PayMasterUrl,
+         paymasterContext
+       );
+       const opts = PayMasterUrl === "" ? {} : {
+         paymasterMiddleware: paymasterMiddleware,
+       }
+       
+       var builder = await Presets.Builder.SimpleAccount.init(signer, rpcUrl, opts);
+               
+             const address = builder.getSender();
+             console.log(`Account address: ${address}`);
       //it should console the getUserOp according to contract
       console.log(builder.getOp());
 
       //send UserOp to erc4337 wallet
       const client = await Client.init(rpcUrl);
+      console.log(getUserOp,callTo)
 
       const response = await client.sendUserOperation(
-        builder.executeBatch(getUserOp),
+        builder.executeBatch(getUserOp.callTo,getUserOp.callData),
         {
           onBuild: (op) => console.log("Signed UserOperation:", op),
         }
@@ -497,7 +501,7 @@ const authenticationController = {
         data: ev,
       });
     } catch (err) {
-      console.log(err);
+      console.log(err)
       res.status(500).json({ error: err });
     }
   },

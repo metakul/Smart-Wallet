@@ -17,7 +17,6 @@ async function connectToDatabase(uri) {
     }
   }
   function getDB() {
-    console.log(db)
     if (!db) {
       throw new Error('Database not connected');
     }
