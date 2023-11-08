@@ -8,7 +8,7 @@ const otps = [];
 // Generate a random OTP of a specified length and save it in the array
 async function generateOTP(userEmailAddress, length = 6) {
   return new Promise(async (resolve) => {
-    const existingOtpEntry = otps.find((entry) => entry.email.toLowerCase() === userEmailAddress.toLowerCase());
+    const existingOtpEntry = otps.find((entry) => entry.userEmailAddress.toLowerCase() === userEmailAddress.toLowerCase());
     let myotp
     if (existingOtpEntry) {
       // If the email already exists, update the existing entry with a new OTP
@@ -20,7 +20,7 @@ async function generateOTP(userEmailAddress, length = 6) {
       const timestamp = Date.now();
 
       // Save the OTP and its creation timestamp in the array
-      otps.push({ email: userEmailAddress, myotp, timestamp });
+      otps.push({ userEmailAddress: userEmailAddress, myotp, timestamp });
     }
 
     // Send the OTP via email
@@ -46,7 +46,7 @@ function verifyOTP(otp, userEmail) {
     const otpEntry = otps[i];
     console.log(otpEntry)
 
-    if (otpEntry.email.toLowerCase() === userEmail.toLowerCase()) {
+    if (otpEntry.userEmailAddress.toLowerCase() === userEmail.toLowerCase()) {
       // Email found in the array
       const currentTime = Date.now();
 
@@ -78,8 +78,8 @@ function verifyOTP(otp, userEmail) {
 
 
 // Remove the OTP entry from the array
-function removeOTP(email, otp) {
-  const index = otps.findIndex((entry) => entry.email === email && entry.otp === otp);
+function removeOTP(userEmailAddress, otp) {
+  const index = otps.findIndex((entry) => entry.userEmailAddress === userEmailAddress && entry.otp === otp);
   if (index !== -1) {
     otps.splice(index, 1);
   }
