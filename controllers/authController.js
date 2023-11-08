@@ -97,7 +97,8 @@ const authenticationController = {
       }
       
       // verify oTP
-      const verifyOTPs=verifyOTP(otp,email)
+      const userEmail=email
+      const verifyOTPs=verifyOTP(otp,userEmail)
       if(verifyOTPs==false){
         return res
         .status(400)
@@ -158,7 +159,7 @@ const authenticationController = {
       res.status(201).json({ message: "User registered successfully" });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ error: "Registration failed" });
+      res.status(500).json({ error: err, message:"Registration failed" });
     }
   },
 
@@ -459,7 +460,6 @@ const authenticationController = {
       const privateKey = decrypt(user.encryptedPrivateKey, password);
 
       const signer = new ethers.Wallet(privateKey);
-      console.log("prvt key",privateKey)
 
       const paymasterContext = { type: "payg" };
       const paymasterMiddleware = Presets.Middleware.verifyingPaymaster(
