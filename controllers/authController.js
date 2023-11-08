@@ -68,16 +68,42 @@ const authenticationController = {
       res.status(500).json({ error: "Initialization failed" });
     }
   },
+  sendOtp: async (req, res) => {
+    try {
+   
+      // Create a new System Admin
+      const { email } = req.body;
+
+     const sendOtptoEmail= await generateOTP(email)    
+     console.log(sendOtptoEmail)  
+
+      res.status(201).json({
+        message: "otp sent successfully",
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Initialization failed" });
+    }
+  },
 
   registerUser: async (req, res) => {
     try {
-      const {firstName,lastName, email, password, phoneNumber, user_country } = req.body;
+      const {firstName,lastName, email, password, phoneNumber, user_country,otp } = req.body;
 
       // Check if the email is already registered
       const existingUser = await User.findByEmail(email);
       if (existingUser) {
         return res.status(400).json({ error: "User Already Exists." });
       }
+      
+      // verify oTP
+      const verifyOTPs=verifyOTP(otp,email)
+      if(verifyOTPs==false){
+        return res
+        .status(400)
+        .json({ error: "Wrong otp" });
+      }
+      console.log(verifyOTPs)
 
       // Validate the email format using a regular expression
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -92,7 +118,6 @@ const authenticationController = {
           .json({ error: "Password must be at least 5 characters long." });
       }
 
-      // Continue with registration if all checks pass
 
       // Generate a new Ethereum wallet using Web3.js
       const wallet = await generateWallet();

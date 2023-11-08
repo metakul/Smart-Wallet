@@ -26,6 +26,7 @@ router.post('/systemAdmin/login', authController.systemAdminLogin);
 // Login route
 router.post('/user/registerUser', authController.registerUser);
 router.post('/user/login', authController.userLogin);
+router.post('/sendOtp', authController.sendOtp);
 
 //refresh Token 
 router.post('/token/refresh', authController.refreshAccessTokenMiddleware);
