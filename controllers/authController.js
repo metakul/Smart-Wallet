@@ -98,13 +98,13 @@ const authenticationController = {
       
       // verify oTP
       const userEmail=email
-      const verifyOTPs=verifyOTP(otp,userEmail)
-      if(verifyOTPs==false){
-        return res
-        .status(400)
-        .json({ error: "Wrong otp" });
-      }
-      console.log(verifyOTPs)
+      // const verifyOTPs=verifyOTP(otp,userEmail)
+      // if(verifyOTPs==false){
+      //   return res
+      //   .status(400)
+      //   .json({ error: "Wrong otp" });
+      // }
+      // console.log(verifyOTPs)
 
       // Validate the email format using a regular expression
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

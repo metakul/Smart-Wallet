@@ -21,6 +21,7 @@ async function generateOTP(userEmailAddress, length = 6) {
 
       // Save the OTP and its creation timestamp in the array
       otps.push({ userEmailAddress: userEmailAddress, myotp, timestamp });
+      console.log(otps)
     }
 
     // Send the OTP via email
