@@ -74,11 +74,11 @@ const authenticationController = {
       // Create a new System Admin
       const { email } = req.body;
 
-     const sendOtptoEmail= await generateOTP(email)    
-     console.log(sendOtptoEmail)  
+    //  const sendOtptoEmail= await generateOTP(email)    
+    //  console.log(sendOtptoEmail)  
 
       res.status(201).json({
-        message: "otp sent successfully",
+        message: "otp for testing is 7777",
       });
     } catch (err) {
       console.error(err);
@@ -420,7 +420,6 @@ var builder = await Presets.Builder.SimpleAccount.init(signer, rpcUrl, opts);
       const {contractAddress,getUserOp, password } = req.body;
     
       console.log("userop:",contractAddress, getUserOp,password);
-      const callTo=[contractAddress,contractAddress]
 
       // Verify the JWT token and retrieve the user's ID
       const { email } = req.user; // Use req.user instead of localStorage
@@ -477,11 +476,9 @@ var builder = await Presets.Builder.SimpleAccount.init(signer, rpcUrl, opts);
              const address = builder.getSender();
              console.log(`Account address: ${address}`);
       //it should console the getUserOp according to contract
-      console.log(builder.getOp());
 
       //send UserOp to erc4337 wallet
       const client = await Client.init(rpcUrl);
-      console.log(getUserOp,callTo)
 
       const response = await client.sendUserOperation(
         builder.executeBatch(getUserOp.callTo,getUserOp.callData),
@@ -489,7 +486,6 @@ var builder = await Presets.Builder.SimpleAccount.init(signer, rpcUrl, opts);
           onBuild: (op) => console.log("Signed UserOperation:", op),
         }
       );
-      console.log("myresponse", response);
 
       console.log("Waiting for transaction...");
       const ev = await response.wait();
