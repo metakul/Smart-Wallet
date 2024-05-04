@@ -39,7 +39,11 @@ class SystemAdmin {
     return result;
   }
 
-
+  static async findOne(filter = {}) {
+    const db = getDB();
+    const systemAdminCollection = db.collection('SYSTEM_ADMIN');
+    return systemAdminCollection.findOne(filter);
+  }
 
   static async findByEmail(email) {
     const db = getDB();

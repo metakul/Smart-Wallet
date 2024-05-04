@@ -33,11 +33,10 @@ const authenticationController = {
   systemAdminInitialize: async (req, res) => {
     try {
       // Check if the System Admin already exists
-      const existingAdminCount = await SystemAdmin.countDocuments({});
-      if (existingAdminCount > 0) {
-        return res.status(400).json({ error: "System Admin already exists" });
+      const existingAdmin = await SystemAdmin.findOne();
+      if (existingAdmin) {
+        return res.status(409).json({ error: "A system admin already exists" });
       }
-  
       // Create a new System Admin
       const { email, password } = req.body;
   
