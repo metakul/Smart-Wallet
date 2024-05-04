@@ -33,23 +33,20 @@ const authenticationController = {
   systemAdminInitialize: async (req, res) => {
     try {
       // Check if the System Admin already exists
-      const existingAdmin = await SystemAdmin.findByEmail({
-        user_type: "SYSTEM_ADMIN",
-      });
-
-      if (existingAdmin) {
+      const existingAdminCount = await SystemAdmin.countDocuments({});
+      if (existingAdminCount > 0) {
         return res.status(400).json({ error: "System Admin already exists" });
       }
-
+  
       // Create a new System Admin
       const { email, password } = req.body;
-
+  
       // Generate a new Ethereum wallet for the System Admin
       const wallet = await generateWallet();
-
+  
       // Encrypt the private key before saving it
       const encryptedPrivateKey = encrypt(wallet.privateKey, password);
-
+  
       const user = new SystemAdmin({
         email,
         password,
@@ -57,9 +54,9 @@ const authenticationController = {
         encryptedPrivateKey,
         user_type: "SYSTEM_ADMIN",
       });
-
+  
       await user.save();
-
+  
       res.status(201).json({
         message: "System Admin registered and initialized successfully",
       });
@@ -68,6 +65,7 @@ const authenticationController = {
       res.status(500).json({ error: "Initialization failed" });
     }
   },
+  
   sendOtp: async (req, res) => {
     try {
    
@@ -292,9 +290,7 @@ var builder = await Presets.Builder.SimpleAccount.init(signer, rpcUrl, opts);
 
       // Send both tokens in the response
       res.json({
-        data: {
           token,
-        },
       });
     } catch (err) {
       console.error(err);
