@@ -169,7 +169,7 @@ var builder = await Presets.Builder.SimpleAccount.init(signer, rpcUrl, opts);
     try {
       const { email, password } = req.body;
 
-      const user = await User.findByEmail(email);
+      const user = await User.findByEmail(email) ||  await SystemAdmin.findByEmail(email) ;
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -181,7 +181,7 @@ var builder = await Presets.Builder.SimpleAccount.init(signer, rpcUrl, opts);
       }
 
       // Check if user_type is "METAKUL_USER"
-      if (user.user_type !== "METAKUL_USER") {
+      if (!user) {
         return res
           .status(403)
           .json({ error: "Do not have enough Permission " });
